@@ -18,9 +18,9 @@ abstract type Space{D,R} end
 
 const RealSpace = Space{D,R} where {D,R<:Real}
 const ComplexSpace = Space{D,R} where {D,R<:Complex}
-const UnivariateSpace = Space{D,R} where {D<:Domain1d,R}
-const BivariateSpace = Space{D,R}  where {D<:Domain2d,R}
-const RealUnivariateSpace = RealSpace{D,R} where {D<:Domain1d,R<:Real}
+const UnivariateSpace = Space{D,R} where {D<:Domain{<:Number},R}
+const BivariateSpace = Space{D,R}  where {D<:EuclideanDomain{2},R}
+const RealUnivariateSpace = RealSpace{D,R} where {D<:Domain{<:Number},R<:Real}
 
 
 
@@ -425,6 +425,10 @@ plan_itransform!(sp::Space,cfs) = error("Override for $sp")
 
 transform(S::Space,vals) = plan_transform(S,vals)*vals
 itransform(S::Space,cfs) = plan_itransform(S,cfs)*cfs
+
+itransform!(S::Space,cfs) = plan_itransform!(S,cfs)*cfs
+transform!(S::Space,cfs) = plan_transform!(S,cfs)*cfs
+
 
 *(P::CanonicalTransformPlan,vals::AbstractVector) = coefficients(P.plan*vals,P.canonicalspace,P.space)
 *(P::ICanonicalTransformPlan,cfs::AbstractVector) = P.plan*coefficients(cfs,P.space,P.canonicalspace)

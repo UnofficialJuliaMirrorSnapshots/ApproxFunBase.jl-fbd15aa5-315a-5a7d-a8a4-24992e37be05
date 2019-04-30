@@ -40,8 +40,23 @@ end
 
 include("multivariate.jl")
 
-function affine_setdiff(d::Domain, ptsin::UnionDomain)    
-    pts=Number.(elements(ptsin))
+affine_setdiff(d::Domain, ptsin::UnionDomain) = 
+    _affine_setdiff(d, Number.(elements(ptsin)))
+
+affine_setdiff(d::Domain, ptsin::WrappedDomain{<:AbstractVector}) = 
+    _affine_setdiff(d, ptsin.domain)
+
+function _affine_setdiff(d::Domain, p::Number) 
+    isempty(d) && return d
+    p ∉ d  && return d
+    a,b = endpoints(d)
+    if leftendpoint(d) > rightendpoint(d) 
+        a,b = b,a
+    end
+    UnionDomain(a..p, p..b) # TODO: Clopen interval
+end
+
+function _affine_setdiff(d::Domain, pts)    
     isempty(pts) && return d
     tol=sqrt(eps(arclength(d)))
     da=leftendpoint(d)
